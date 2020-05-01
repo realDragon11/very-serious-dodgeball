@@ -29,7 +29,7 @@ public class TrajectoryCalcculator : MonoBehaviour
         float maxHeight = MaxHeight();
         highestP = HighestPoint(maxHeight);
 
-        bool isClear = IsClearTrajectory(highestP);
+        //bool isClear = IsClearTrajectory(highestP);
     }
 
     private bool IsClearTrajectory(Vector3 highestP)
