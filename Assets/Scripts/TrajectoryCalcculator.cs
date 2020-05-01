@@ -8,43 +8,28 @@ public class TrajectoryCalcculator : MonoBehaviour
     public Transform player;
     public static Vector3 highestP = Vector3.zero;
     public static float initialSpeed = 0;
+    public static Vector3 targetPos, lookTo;
 
-    private Vector3 selectedTheta, targetPos, testRange;
+    private Vector3 testRange, midPoint, hP;
     private float range;
     private int[] angles = { 15, 30, 45 };
     private float minU, maxU;
-    // Start is called before the first frame update
-    void Start()
-    {
-        targetPos = player.position;
-        SelectTrajectory();
-        //CorrectHeight();
-    }
+    public static int selectedTheta;
+    private int alpha;
 
     // Update is called once per frame
     void Update()
-    { 
-        /*if(Input.GetKeyUp(KeyCode.A))
-        {
-            SelectTrajectory();
-        }*/
+    {
+        targetPos = player.position + Vector3.up * .95f;
+        SelectTrajectory();
     }
 
     private void SelectTrajectory()
     {
-        /*float x = -Random.Range(0, 10.0f);
-        float y = Random.Range(0, 10.0f);
-        float z = Random.Range(0, 10.0f);*/
-
         float maxHeight = MaxHeight();
         highestP = HighestPoint(maxHeight);
-        //print(highestP);
-        //GameObject instance1 = Instantiate(test, transform.position, Quaternion.identity);
-        GameObject instance2 = Instantiate(test, highestP, Quaternion.identity);
-        CorrectHeight();
-        //GameObject instance3 = Instantiate(test, testRange, Quaternion.identity);
+
         bool isClear = IsClearTrajectory(highestP);
-        //print(isClear);
     }
 
     private bool IsClearTrajectory(Vector3 highestP)
@@ -66,105 +51,88 @@ public class TrajectoryCalcculator : MonoBehaviour
     private float MinimumInitialSpeed(float g)
     {
         float r = Range();
-        float theta = 45;
-        return Mathf.Sqrt(r * g / Mathf.Sin(2 * theta * Mathf.Deg2Rad));
+        alpha = AdjustedAngleByElevation(transform.position, targetPos);
+        int theta = 45;//Mathf.Clamp(45, alpha, 90);
+        float radAlpha = alpha * Mathf.Deg2Rad;
+        float numerator = r * g * Mathf.Pow(Mathf.Cos(radAlpha), 2);
+        float denominator = Mathf.Sin(2 * theta * Mathf.Deg2Rad - radAlpha) - Mathf.Sin(radAlpha);
 
+        return Mathf.Sqrt(numerator / denominator);
+        //return Mathf.Sqrt(r * g / Mathf.Sin(2 * theta * Mathf.Deg2Rad));
     }
 
     private float Range()
     {
-        Vector2 target = new Vector2(targetPos.x, targetPos.z);
-        Vector2 origin = new Vector2(transform.position.x, transform.position.z);
-        return Vector2.Distance(target, origin);
+        return Vector3.Distance(targetPos, transform.position);
     }
 
-    private float Angle(float g, float u)
+    private int Angle(float g, float u)
     {
         float r = Range();
-        return Mathf.Asin(r * g / (u * u)) * Mathf.Rad2Deg / 2;
+        float radAlpha = alpha * Mathf.Deg2Rad;
+        float numerator = r * g * Mathf.Pow(Mathf.Cos(radAlpha), 2);
+        float intoASin = Mathf.Clamp(numerator / (u * u) + Mathf.Sin(radAlpha), -1, 1);
+
+        return (int)(((Mathf.Asin(intoASin) * Mathf.Rad2Deg + alpha) / 2));
+        //return (int)(Mathf.Asin(Mathf.Clamp(r * g / (u * u), -1, 1)) * Mathf.Rad2Deg / 2);
     }
 
-    private float MaxHeight(/*Vector3 trajectory*/)
+    private int AdjustedAngleByElevation(Vector3 pivot, Vector3 other)
     {
-        //selectedTheta = CustomNormals(trajectory);
-        //Vector3 targetAngle = selectedTheta + transform.position;
+        bool xORz = Mathf.Abs(other.x - pivot.x) > Mathf.Abs(other.z - pivot.z);
+
+        int angle;
+        if (xORz) angle = PointToDegree(new Vector2(pivot.x, pivot.y), new Vector2(other.x, other.y));
+        else angle = PointToDegree(new Vector2(pivot.z, pivot.y), new Vector2(other.z, other.y));
+        
+        if (pivot.y > other.y) angle = -angle;
+
+        return angle;
+    }
+
+    private float MaxHeight()
+    {
         float g = Physics.gravity.magnitude;
-        float u = MinimumInitialSpeed(g);//selectedU;
+        float u = MinimumInitialSpeed(g);
         initialSpeed = u;
-        float theta = Angle(g, u);//PointToDegree(transform.position, new Vector2(targetAngle.x, targetAngle.y));
-        //print(theta);
+        int theta = Angle(g, u);
         float yI = Mathf.Sin(theta * Mathf.Deg2Rad) * u;
         float h = yI * yI / (2 * g);
-        /*range = u * u * Mathf.Sin(theta) / g;
-        float x = selectedTheta.x * range + transform.position.x;
-        float z = selectedTheta.z * range + transform.position.z;
-        testRange = new Vector3(x, transform.position.y, z); */       
+        selectedTheta = theta;
 
         return h;
     }
 
     private Vector3 HighestPoint(float y)
     {
-        if (y == 0) return Vector3.zero;
+        if (y == 0) return transform.position;
         else
         {
-            /*float theta = Mathf.Atan(selectedTheta.y / selectedTheta.z) * Mathf.Rad2Deg;
-            float hyp = y / Mathf.Sin(theta);
+            float dist = Vector3.Distance(targetPos, transform.position) / 2;
 
-            float cos = theta == 90 ? 0 : Mathf.Cos(theta);
-            float adjA = hyp * cos, adjB;
+            Vector3 dir = (targetPos - transform.position).normalized * dist;
 
-            theta = Mathf.Atan(selectedTheta.y / selectedTheta.x) * Mathf.Rad2Deg;
-            hyp = y / Mathf.Sin(theta);
-
-            cos = theta == 90 ? 0 : Mathf.Cos(theta);
-            adjB = hyp * cos;*/
-
-            //return new Vector3(adjB + transform.position.x, y + transform.position.y, adjA + transform.position.z);
-
-            Vector2 start = new Vector2(transform.position.x, transform.position.z);
-            Vector2 target = new Vector2(targetPos.x, targetPos.z);
-            float dist = Vector2.Distance(target, start) / 2;
-
-            float horizontalAngle = PointToDegree(start, target);
-            selectedTheta = AngleToVector3(horizontalAngle);
-            //print(horizontalAngle +" "+selectedTheta);
-            Vector2 adjustDir = new Vector2(target.x - selectedTheta.x, target.y - selectedTheta.z).normalized;
-            Vector3 direction = new Vector3(adjustDir.x * dist, 0, adjustDir.y * dist);
-
-            return new Vector3(transform.position.x + direction.x, y + transform.position.y, transform.position.z + direction.z);
-
+            return new Vector3(transform.position.x + dir.x, y + transform.position.y + dir.y + 7.5f, transform.position.z + dir.z);
         }
     }
 
-    private Vector3 CustomNormals(Vector3 original)
+    public static Vector3 LookToPoint(Vector3 thisPos)
     {
-        float highMag = 0;
+        Vector3 dir = (targetPos - thisPos).normalized;
+        Vector2 vertical = AngleToVector2(selectedTheta);
 
-        highMag = Mathf.Abs(highMag) < Mathf.Abs(original.x) ? highMag = Mathf.Abs(original.x) : highMag;
-        highMag = Mathf.Abs(highMag) < Mathf.Abs(original.y) ? highMag = Mathf.Abs(original.y) : highMag;
-        highMag = Mathf.Abs(highMag) < Mathf.Abs(original.z) ? highMag = Mathf.Abs(original.z) : highMag;
-
-        if (highMag == 0) return original;
-        else
-        {
-            float x = original.x / highMag;
-            float y = original.y / highMag;
-            float z = original.z / highMag;
-
-            return new Vector3(x, y, z);
-        }
+        return new Vector3(dir.x, vertical.y, dir.z).normalized;
     }
 
-    private float PointToDegree(Vector2 start, Vector2 end)
+    public static int PointToDegree(Vector2 start, Vector2 end)
     {
         float x = end.x - start.x;
         float y = end.y - start.y;
 
-        return Mathf.Abs(Mathf.Atan(y / x) * Mathf.Rad2Deg);
+        return y != 0 ? (int)Mathf.Abs(Mathf.Atan(y / x) * Mathf.Rad2Deg) : 0;
     }
-
-    private Vector2 AngleToVector3(float theta)
+   
+    public static Vector2 AngleToVector2(float theta)
     {
         float x, y;
         theta %= 360;
@@ -173,13 +141,13 @@ public class TrajectoryCalcculator : MonoBehaviour
             int mod = theta > 315 ? 0 : 1;
             theta = theta > 315 ? 45 - (355 - theta) : theta;
             x = 1;
-            y = -1 + (mod + theta / 5 * (1 / 9.0f));
+            y = -1 + (mod + theta * (1 / 45.0f));
         }
         else if (theta > 45 && theta <= 135)
         {
             int mod = theta > 90 ? 1 : 0;
             theta = theta > 90 ? 45 - (135 - theta) : 45 - (90 - theta);
-            x = 1 - (mod + theta / 5 * (1 / 9.0f));
+            x = 1 - (mod + theta * (1 / 45.0f));
             y = 1;
         }
         else if (theta > 135 && theta <= 225)
@@ -187,13 +155,13 @@ public class TrajectoryCalcculator : MonoBehaviour
             int mod = theta > 180 ? 1 : 0;
             theta = theta > 180 ? 45 - (225 - theta) : 45 - (180 - theta);
             x = -1;
-            y = 1 - (mod + theta / 5 * (1 / 9.0f));
+            y = 1 - (mod + theta * (1 / 45.0f));
         }
         else if (theta > 225 && theta <= 315)
         {
             int mod = theta > 270 ? 1 : 0;
             theta = theta > 270 ? 45 - (315 - theta) : 45 - (270 - theta);
-            x = -1 + (mod + theta / 5 * (1 / 9.0f));
+            x = -1 + (mod + theta * (1 / 45.0f));
             y = -1;
         }
         else
@@ -204,37 +172,4 @@ public class TrajectoryCalcculator : MonoBehaviour
 
         return new Vector2(x, y);
     }
-
-    private void CorrectHeight()
-    {
-        Vector2 target = new Vector2(targetPos.x, targetPos.z);
-        Vector2 origin = new Vector2(transform.position.x, transform.position.z);
-        float r = Vector2.Distance(target, origin);
-        float g = Physics.gravity.magnitude;
-        float theta = 45;
-        float u = Mathf.Sqrt(r * g / Mathf.Sin(2 * theta * Mathf.Deg2Rad));
-        float yI = Mathf.Sin(theta * Mathf.Deg2Rad) * u;
-
-        //print(u);
-        print((yI * yI / (2 * g)) + 1.5 + " max height");
-    }
-
-    /*private void OnDrawGizmos()
-    {
-        if (!duh)
-        {
-            StartCoroutine(Duh());
-            float y = MaxHeight();
-
-            highestP = HighestPoint(y);            
-        }
-        Gizmos.DrawSphere(highestP, .5f);
-    }
-
-    private IEnumerator Duh()
-    {
-        duh = true;
-        yield return new WaitForSeconds(10);
-        duh = false;
-    }*/
 }

@@ -5,45 +5,39 @@ using UnityEngine;
 public class BallSpawner : MonoBehaviour
 {
     public GameObject ball;
+    public Transform shooter;
 
-    private bool shooting = false;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        Vector3 adjusted = transform.position + new Vector3(-1f, 1f, 0);
-    }
+    private bool shooting = false, loadingShot = false;
+    private Vector3 trajectory = Vector3.zero;
 
     // Update is called once per frame
     void Update()
     {
         if (!shooting) StartCoroutine(Shoot());
+
+        FollowPlayer();
+    }
+
+    private void FollowPlayer()
+    {
+        trajectory = TrajectoryCalcculator.LookToPoint(transform.position);
+        shooter.LookAt(transform.position + trajectory);
     }
 
     private IEnumerator Shoot()
     {
         shooting = true;
-        float y = Random.Range(0, 1.0f);
-
-        Vector3 trajectory = transform.position - transform.parent.transform.position;
-        trajectory.Normalize();
-        //new Vector3(-1f, 1f, 0f).normalized;
-        trajectory *= TrajectoryCalcculator.initialSpeed;
+        loadingShot = true;
 
         yield return new WaitForSeconds(3f);
+        loadingShot = false;
 
+        float y = Random.Range(0, 1.0f);
+        
+        trajectory *= TrajectoryCalcculator.initialSpeed;
         GameObject instance = Instantiate(ball, transform.position, Quaternion.identity);
         Rigidbody rb = instance.GetComponent<Rigidbody>();
         rb.velocity = trajectory;
-        
         shooting = false;
-    }
-
-    private float PointToDegree(Vector3 start, Vector3 end)
-    {
-        float x = end.x - start.x;
-        float y = end.y - start.y;
-
-        return Mathf.Abs(Mathf.Atan(y / x) * Mathf.Rad2Deg);
     }
 }
