@@ -9,26 +9,39 @@ public class TrajectoryCalcculator : MonoBehaviour
     public static Vector3 highestP = Vector3.zero;
     public static float initialSpeed = 0;
     public static Vector3 targetPos, lookTo;
+    public static Vector2[] trajectories = new Vector2[5];
+    public static Vector2 chosen = Vector2.zero;
 
-    private Vector3 testRange, midPoint, hP;
-    private float range;
-    private int[] angles = { 15, 30, 45 };
-    private float minU, maxU;
+    private Vector3 testRange;
+    private float r, g = Physics.gravity.magnitude, minU, maxU = 20;
     public static int selectedTheta;
     private int alpha;
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
         targetPos = player.position + Vector3.up * .95f;
         SelectTrajectory();
     }
 
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
     private void SelectTrajectory()
     {
-        float maxHeight = MaxHeight();
-        highestP = HighestPoint(maxHeight);
+        LoadVariables();
+        LoadAngles();
 
+        for(int i = 0; i < trajectories.Length; i++)
+        {
+            float maxHeight = MaxHeight(trajectories[i]);
+            highestP = HighestPoint(maxHeight);
+            //GameObject instance = Instantiate(test, highestP, Quaternion.identity);
+            //print(trajectories[i]);
+        }
+        chosen = trajectories[0];
         //bool isClear = IsClearTrajectory(highestP);
     }
 
@@ -73,7 +86,7 @@ public class TrajectoryCalcculator : MonoBehaviour
         float numerator = r * g * Mathf.Pow(Mathf.Cos(radAlpha), 2);
         float intoASin = Mathf.Clamp(numerator / (u * u) + Mathf.Sin(radAlpha), -1, 1);
 
-        return (int)(((Mathf.Asin(intoASin) * Mathf.Rad2Deg + alpha) / 2));
+        return (int)((Mathf.Asin(intoASin) * Mathf.Rad2Deg + alpha) / 2);
         //return (int)(Mathf.Asin(Mathf.Clamp(r * g / (u * u), -1, 1)) * Mathf.Rad2Deg / 2);
     }
 
@@ -90,17 +103,32 @@ public class TrajectoryCalcculator : MonoBehaviour
         return angle;
     }
 
-    private float MaxHeight()
+    private void LoadVariables()
     {
-        float g = Physics.gravity.magnitude;
-        float u = MinimumInitialSpeed(g);
-        initialSpeed = u;
-        int theta = Angle(g, u);
+        r = Range();
+        minU = MinimumInitialSpeed(g);
+    }
+
+    private float MaxHeight(Vector2 trajectory)
+    {
+        int theta = (int)trajectory.x;
+        float u = trajectory.y;
         float yI = Mathf.Sin(theta * Mathf.Deg2Rad) * u;
         float h = yI * yI / (2 * g);
-        selectedTheta = theta;
 
         return h;
+    }
+
+    private void LoadAngles()
+    {
+        float u = minU;
+        for (int i = 0; i < trajectories.Length; i++)
+        {
+            trajectories[i].x = Mathf.Clamp(Angle(g, u), alpha, 90);
+            trajectories[i].y = u;
+
+            u = Random.Range(minU, maxU);
+        }        
     }
 
     private Vector3 HighestPoint(float y)
@@ -112,14 +140,14 @@ public class TrajectoryCalcculator : MonoBehaviour
 
             Vector3 dir = (targetPos - transform.position).normalized * dist;
 
-            return new Vector3(transform.position.x + dir.x, y + transform.position.y + dir.y + 7.5f, transform.position.z + dir.z);
+            return new Vector3(transform.position.x + dir.x, y + transform.position.y + dir.y, transform.position.z + dir.z);
         }
     }
 
-    public static Vector3 LookToPoint(Vector3 thisPos)
+    public static Vector3 LookToPoint(Vector3 thisPos, float angle)
     {
         Vector3 dir = (targetPos - thisPos).normalized;
-        Vector2 vertical = AngleToVector2(selectedTheta);
+        Vector2 vertical = AngleToVector2(angle);
 
         return new Vector3(dir.x, vertical.y, dir.z).normalized;
     }
@@ -129,7 +157,7 @@ public class TrajectoryCalcculator : MonoBehaviour
         float x = end.x - start.x;
         float y = end.y - start.y;
 
-        return y != 0 ? (int)Mathf.Abs(Mathf.Atan(y / x) * Mathf.Rad2Deg) : 0;
+        return y != 0 ? (int)(Mathf.Atan(y / x) * Mathf.Rad2Deg) : 0;
     }
    
     public static Vector2 AngleToVector2(float theta)
@@ -171,5 +199,54 @@ public class TrajectoryCalcculator : MonoBehaviour
         }
 
         return new Vector2(x, y);
+    }
+
+    public static Vector3 AngleToVector3(int vertical, int horizontal)
+    {
+        int[] angles = { vertical, horizontal };
+        Vector2[] vectors = new Vector2[2];
+        for(int i = 0; i < 2; i++)
+        {
+            int theta = angles[i];
+            float x, y;
+            theta %= 360;
+            if (theta <= 45 || (theta > 315 && theta <= 359))
+            {
+                int mod = theta > 315 ? 0 : 1;
+                theta = theta > 315 ? 45 - (355 - theta) : theta;
+                x = 1;
+                y = -1 + (mod + theta * (1 / 45.0f));
+            }
+            else if (theta > 45 && theta <= 135)
+            {
+                int mod = theta > 90 ? 1 : 0;
+                theta = theta > 90 ? 45 - (135 - theta) : 45 - (90 - theta);
+                x = 1 - (mod + theta * (1 / 45.0f));
+                y = 1;
+            }
+            else if (theta > 135 && theta <= 225)
+            {
+                int mod = theta > 180 ? 1 : 0;
+                theta = theta > 180 ? 45 - (225 - theta) : 45 - (180 - theta);
+                x = -1;
+                y = 1 - (mod + theta * (1 / 45.0f));
+            }
+            else if (theta > 225 && theta <= 315)
+            {
+                int mod = theta > 270 ? 1 : 0;
+                theta = theta > 270 ? 45 - (315 - theta) : 45 - (270 - theta);
+                x = -1 + (mod + theta * (1 / 45.0f));
+                y = -1;
+            }
+            else
+            {
+                x = 0;
+                y = 0;
+            }
+
+            vectors[i] = new Vector2(x, y);
+        }
+
+        return new Vector3(vectors[0].x, vectors[0].y, vectors[1].y);
     }
 }

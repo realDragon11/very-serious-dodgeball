@@ -13,11 +13,12 @@ public class PickupBall : MonoBehaviour
     private bool fumbleTime = false, catching = false;
     private List <Collider> foreignObjs = new List<Collider>();
     private Collider lastCaught = null, lastHit = null;
+    private Health health;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        health = GetComponent<Health>();
     }
 
     // Update is called once per frame
@@ -98,9 +99,9 @@ public class PickupBall : MonoBehaviour
         yield return new WaitForSeconds(.5f);
 
         if (collision.collider != lastCaught)
-        {
-            lastHit = collision.collider;
-            hit++;
+        {                        
+            health.DeductHealth();            
+            //hit++;
             //print("Hit: " + hit);
             //Destroy(collision.gameObject);
             //ThrowBall.hasBall = true;
@@ -111,6 +112,8 @@ public class PickupBall : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ball") && collision.collider != lastHit)
         {
+            print(collision.collider);
+            lastHit = collision.collider;
             StartCoroutine(CatchBuffer(collision));            
         }
     }
