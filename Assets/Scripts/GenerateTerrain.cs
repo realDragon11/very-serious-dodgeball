@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class GenerateTerrain : MonoBehaviour
@@ -12,6 +13,7 @@ public class GenerateTerrain : MonoBehaviour
     private Vector3[] verts;
     private int[] triangles;
     private Mesh mesh;
+
 
     // Start is called before the first frame update
     void Start()
