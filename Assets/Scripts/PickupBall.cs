@@ -14,11 +14,13 @@ public class PickupBall : MonoBehaviour
     private List <Collider> foreignObjs = new List<Collider>();
     private Collider lastCaught = null, lastHit = null;
     private Health health;
+    private CapsuleCollider cc;
 
     // Start is called before the first frame update
     void Start()
     {
         health = GetComponent<Health>();
+        cc = GetComponent<CapsuleCollider>();
     }
 
     // Update is called once per frame
@@ -29,19 +31,21 @@ public class PickupBall : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        foreignObjs.Add(other);
+        if (Vector3.Distance(other.ClosestPointOnBounds(transform.position), transform.position) <= cc.radius)         
+            foreignObjs.Add(other);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        foreignObjs.Remove(other);
+        if (Vector3.Distance(other.ClosestPointOnBounds(transform.position), transform.position) > cc.radius)
+            foreignObjs.Remove(other);
     }
 
     private void Catch()
     {
         if (Input.GetKey(KeyCode.LeftShift))
         {            
-            if (!fumbleTime && !catching)
+            if (!fumbleTime && !catching && !ThrowBall.hasBall)
             {
                 StartCoroutine(Catching());
                 if (foreignObjs.Count > 0)
@@ -50,21 +54,19 @@ public class PickupBall : MonoBehaviour
                     {
                         if (foreignObjs[i].CompareTag("Ball"))
                         {
-                            //Vector3 startPos = origin.forward * .5f;
-                            Vector3 endPos = origin.forward * 3.5f;
-                            //startPos.y += origin.position.y;
-                            endPos.y += origin.position.y;
-                            Collider[] col = Physics.OverlapCapsule(origin.position, endPos, tollerance);
+                            Collider[] col = InSight.seen.ToArray();
 
                             foreach (Collider c in col)
-                            {
+                            {                                
                                 if (foreignObjs[i] == c)
                                 {
                                     caught++;
                                     //print("Catch: " + caught);
                                     lastCaught = foreignObjs[i];
                                     Destroy(foreignObjs[i].gameObject);
-                                    foreignObjs.RemoveAt(i);
+                                    foreignObjs.Remove(c);
+                                    foreignObjs = new List<Collider>();
+                                    InSight.seen.Remove(c);
                                     ThrowBall.hasBall = true;
                                     break;
                                 }
@@ -98,7 +100,7 @@ public class PickupBall : MonoBehaviour
     {
         yield return new WaitForSeconds(.5f);
 
-        if (collision.collider != lastCaught)
+        if (collision.collider != lastCaught && collision.gameObject.GetComponent<BallData>().alive)
         {                        
             health.DeductHealth();            
             //hit++;

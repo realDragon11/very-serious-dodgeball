@@ -17,20 +17,14 @@ public class TrajectoryCalcculator : MonoBehaviour
     public static int selectedTheta;
     private int alpha;
 
-    private void Start()
-    {
-        targetPos = player.position + Vector3.up * .95f;
-        SelectTrajectory();
-    }
-
     // Update is called once per frame
     void Update()
     {
-        
+        targetPos = player.position + Vector3.up * .95f;
     }
 
-    private void SelectTrajectory()
-    {
+    public void SelectTrajectory()
+    { 
         LoadVariables();
         LoadAngles();
 
@@ -38,40 +32,16 @@ public class TrajectoryCalcculator : MonoBehaviour
         {
             float maxHeight = MaxHeight(trajectories[i]);
             highestP = HighestPoint(maxHeight);
-            //GameObject instance = Instantiate(test, highestP, Quaternion.identity);
-            //print(trajectories[i]);
         }
-        chosen = trajectories[0];
-        //bool isClear = IsClearTrajectory(highestP);
+        chosen = trajectories[Random.Range(0, trajectories.Length)];
+        float t = Time((int)chosen.x, chosen.y);
+        lookTo = LookToPoint(t);
     }
 
-    private bool IsClearTrajectory(Vector3 highestP)
+    private void LoadVariables()
     {
-        bool up = Physics.CheckCapsule(transform.position, highestP, .75f), down = true;
-        Collider[] cols = Physics.OverlapCapsule(highestP, targetPos, .75f);
-        foreach(Collider c in cols)
-        {
-            if(!c.CompareTag("Player") || !c.CompareTag("Ground"))
-            {
-                down = false;
-                break;
-            }
-        }
-
-        return up && down;
-    }
-
-    private float MinimumInitialSpeed(float g)
-    {
-        float r = Range();
-        alpha = AdjustedAngleByElevation(transform.position, targetPos);
-        int theta = 45;//Mathf.Clamp(45, alpha, 90);
-        float radAlpha = alpha * Mathf.Deg2Rad;
-        float numerator = r * g * Mathf.Pow(Mathf.Cos(radAlpha), 2);
-        float denominator = Mathf.Sin(2 * theta * Mathf.Deg2Rad - radAlpha) - Mathf.Sin(radAlpha);
-
-        return Mathf.Sqrt(numerator / denominator);
-        //return Mathf.Sqrt(r * g / Mathf.Sin(2 * theta * Mathf.Deg2Rad));
+        r = Range();
+        minU = MinimumInitialSpeed(g);
     }
 
     private float Range()
@@ -79,15 +49,16 @@ public class TrajectoryCalcculator : MonoBehaviour
         return Vector3.Distance(targetPos, transform.position);
     }
 
-    private int Angle(float g, float u)
+    private float MinimumInitialSpeed(float g)
     {
         float r = Range();
+        alpha = AdjustedAngleByElevation(transform.position, targetPos);
+        int theta = Mathf.Clamp(45 + alpha, alpha, 90);
         float radAlpha = alpha * Mathf.Deg2Rad;
         float numerator = r * g * Mathf.Pow(Mathf.Cos(radAlpha), 2);
-        float intoASin = Mathf.Clamp(numerator / (u * u) + Mathf.Sin(radAlpha), -1, 1);
+        float denominator = Mathf.Sin(2 * (theta - alpha) * Mathf.Deg2Rad) - Mathf.Sin(radAlpha);
 
-        return (int)((Mathf.Asin(intoASin) * Mathf.Rad2Deg + alpha) / 2);
-        //return (int)(Mathf.Asin(Mathf.Clamp(r * g / (u * u), -1, 1)) * Mathf.Rad2Deg / 2);
+        return Mathf.Sqrt(numerator / denominator);
     }
 
     private int AdjustedAngleByElevation(Vector3 pivot, Vector3 other)
@@ -97,26 +68,20 @@ public class TrajectoryCalcculator : MonoBehaviour
         int angle;
         if (xORz) angle = PointToDegree(new Vector2(pivot.x, pivot.y), new Vector2(other.x, other.y));
         else angle = PointToDegree(new Vector2(pivot.z, pivot.y), new Vector2(other.z, other.y));
-        
+
         if (pivot.y > other.y) angle = -angle;
 
         return angle;
     }
 
-    private void LoadVariables()
+    public static int PointToDegree(Vector2 start, Vector2 end)
     {
-        r = Range();
-        minU = MinimumInitialSpeed(g);
-    }
+        float x = end.x - start.x;
+        float y = end.y - start.y;
 
-    private float MaxHeight(Vector2 trajectory)
-    {
-        int theta = (int)trajectory.x;
-        float u = trajectory.y;
-        float yI = Mathf.Sin(theta * Mathf.Deg2Rad) * u;
-        float h = yI * yI / (2 * g);
+        bool isZero = x == 0 || y == 0;
 
-        return h;
+        return isZero ? (int)Mathf.Abs(Mathf.Atan(y / x) * Mathf.Rad2Deg) : 0;
     }
 
     private void LoadAngles()
@@ -128,7 +93,27 @@ public class TrajectoryCalcculator : MonoBehaviour
             trajectories[i].y = u;
 
             u = Random.Range(minU, maxU);
-        }        
+        }
+    }
+
+    private int Angle(float g, float u)
+    {
+        float r = Range();
+        float radAlpha = alpha * Mathf.Deg2Rad;
+        float numerator = r * g * Mathf.Pow(Mathf.Cos(radAlpha), 2);
+        float intoASin = Mathf.Clamp(numerator / (u * u) + Mathf.Sin(radAlpha), -1, 1);
+
+        return (int)((Mathf.Asin(intoASin) * Mathf.Rad2Deg + alpha) / 2);
+    }
+
+    private float MaxHeight(Vector2 trajectory)
+    {
+        int theta = (int)trajectory.x;
+        float u = trajectory.y;
+        float yI = Mathf.Sin(theta * Mathf.Deg2Rad) * u;
+        float h = yI * yI / (2 * g);
+
+        return h;
     }
 
     private Vector3 HighestPoint(float y)
@@ -144,109 +129,46 @@ public class TrajectoryCalcculator : MonoBehaviour
         }
     }
 
-    public static Vector3 LookToPoint(Vector3 thisPos, float angle)
+    private float Time(int theta, float u)
     {
-        Vector3 dir = (targetPos - thisPos).normalized;
-        Vector2 vertical = AngleToVector2(angle);
-
-        return new Vector3(dir.x, vertical.y, dir.z).normalized;
+        float radAlpha = alpha * Mathf.Deg2Rad;
+        return 2 * u * Mathf.Sin((theta - alpha) * Mathf.Deg2Rad) / (g * Mathf.Cos(radAlpha));
     }
 
-    public static int PointToDegree(Vector2 start, Vector2 end)
+    public Vector3 LookToPoint(float time)
     {
-        float x = end.x - start.x;
-        float y = end.y - start.y;
+        Vector3 origin = transform.position;
 
-        return y != 0 ? (int)(Mathf.Atan(y / x) * Mathf.Rad2Deg) : 0;
-    }
-   
-    public static Vector2 AngleToVector2(float theta)
-    {
-        float x, y;
-        theta %= 360;
-        if (theta <= 45 || (theta > 315 && theta <= 359))
-        {
-            int mod = theta > 315 ? 0 : 1;
-            theta = theta > 315 ? 45 - (355 - theta) : theta;
-            x = 1;
-            y = -1 + (mod + theta * (1 / 45.0f));
-        }
-        else if (theta > 45 && theta <= 135)
-        {
-            int mod = theta > 90 ? 1 : 0;
-            theta = theta > 90 ? 45 - (135 - theta) : 45 - (90 - theta);
-            x = 1 - (mod + theta * (1 / 45.0f));
-            y = 1;
-        }
-        else if (theta > 135 && theta <= 225)
-        {
-            int mod = theta > 180 ? 1 : 0;
-            theta = theta > 180 ? 45 - (225 - theta) : 45 - (180 - theta);
-            x = -1;
-            y = 1 - (mod + theta * (1 / 45.0f));
-        }
-        else if (theta > 225 && theta <= 315)
-        {
-            int mod = theta > 270 ? 1 : 0;
-            theta = theta > 270 ? 45 - (315 - theta) : 45 - (270 - theta);
-            x = -1 + (mod + theta * (1 / 45.0f));
-            y = -1;
-        }
-        else
-        {
-            x = 0;
-            y = 0;
-        }
+        Vector3 distance = targetPos - origin;
+        Vector3 distanceXZ = distance;
+        distanceXZ.y = 0;
 
-        return new Vector2(x, y);
+        float sY = distance.y;
+        float sXZ = distanceXZ.magnitude;
+
+        float vXZ = sXZ / time;
+        float vY = sY / time + .5f * g * time;
+
+        Vector3 result = distanceXZ.normalized;
+        result *= vXZ;
+        result.y = vY;
+
+        return result;
     }
 
-    public static Vector3 AngleToVector3(int vertical, int horizontal)
+    private bool IsClearTrajectory(Vector3 highestP)
     {
-        int[] angles = { vertical, horizontal };
-        Vector2[] vectors = new Vector2[2];
-        for(int i = 0; i < 2; i++)
+        bool up = Physics.CheckCapsule(transform.position, highestP, .75f), down = true;
+        Collider[] cols = Physics.OverlapCapsule(highestP, targetPos, .75f);
+        foreach (Collider c in cols)
         {
-            int theta = angles[i];
-            float x, y;
-            theta %= 360;
-            if (theta <= 45 || (theta > 315 && theta <= 359))
+            if (!c.CompareTag("Player") || !c.CompareTag("Ground"))
             {
-                int mod = theta > 315 ? 0 : 1;
-                theta = theta > 315 ? 45 - (355 - theta) : theta;
-                x = 1;
-                y = -1 + (mod + theta * (1 / 45.0f));
+                down = false;
+                break;
             }
-            else if (theta > 45 && theta <= 135)
-            {
-                int mod = theta > 90 ? 1 : 0;
-                theta = theta > 90 ? 45 - (135 - theta) : 45 - (90 - theta);
-                x = 1 - (mod + theta * (1 / 45.0f));
-                y = 1;
-            }
-            else if (theta > 135 && theta <= 225)
-            {
-                int mod = theta > 180 ? 1 : 0;
-                theta = theta > 180 ? 45 - (225 - theta) : 45 - (180 - theta);
-                x = -1;
-                y = 1 - (mod + theta * (1 / 45.0f));
-            }
-            else if (theta > 225 && theta <= 315)
-            {
-                int mod = theta > 270 ? 1 : 0;
-                theta = theta > 270 ? 45 - (315 - theta) : 45 - (270 - theta);
-                x = -1 + (mod + theta * (1 / 45.0f));
-                y = -1;
-            }
-            else
-            {
-                x = 0;
-                y = 0;
-            }
-
-            vectors[i] = new Vector2(x, y);
         }
 
-        return new Vector3(vectors[0].x, vectors[0].y, vectors[1].y);
+        return up && down;
     }
 }

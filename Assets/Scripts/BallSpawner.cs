@@ -8,14 +8,41 @@ public class BallSpawner : MonoBehaviour
     public Transform shooter;
 
     private bool shooting = false, hasBall = false;
-    private Vector3 trajectory = Vector3.zero;
+    private Vector3 trajectory = Vector3.zero, trajectoryXZ = Vector3.zero;
+    private TrajectoryCalcculator tc;
+
+    private void Start()
+    {
+        tc = GetComponent<TrajectoryCalcculator>();
+    }
 
     // Update is called once per frame
     void Update()
     {
-        FollowPlayer();
+        shooter.LookAt(TrajectoryCalcculator.targetPos);
 
         if (!shooting) StartCoroutine(Shoot()); 
+    }
+
+    private IEnumerator Shoot()
+    {
+        tc.SelectTrajectory();
+        shooting = true;
+        trajectory = TrajectoryCalcculator.lookTo.normalized;
+        shooter.LookAt(transform.position + trajectory);
+
+        
+
+        float y = Random.Range(0, 1.0f);
+
+        trajectory *= TrajectoryCalcculator.chosen.y;
+        GameObject instance = Instantiate(ball, transform.position, Quaternion.identity);
+        //ball.GetComponent<BallData>().alive = true;
+        Rigidbody rb = instance.GetComponent<Rigidbody>();
+        rb.velocity = trajectory;
+        yield return new WaitForSeconds(3f);
+        shooting = false;
+        hasBall = false;
     }
 
     public void ThrowBall()
@@ -27,31 +54,5 @@ public class BallSpawner : MonoBehaviour
     public void PickupBall()
     {
         hasBall = true;
-    }
-
-    private void FollowPlayer(/*int i*/)
-    {
-        trajectory = TrajectoryCalcculator.LookToPoint(transform.position, (int)TrajectoryCalcculator.chosen.x);
-        shooter.LookAt(transform.position + trajectory);
-    }
-
-    private IEnumerator Shoot()
-    {
-        shooting = true;
-        //for (int i = 0; i < 5; i++)
-        //{
-            //FollowPlayer();
-            
-            yield return new WaitForSeconds(3f);
-
-            float y = Random.Range(0, 1.0f);
-
-            trajectory *= TrajectoryCalcculator.chosen.y;
-            GameObject instance = Instantiate(ball, transform.position, Quaternion.identity);
-            Rigidbody rb = instance.GetComponent<Rigidbody>();
-            rb.velocity = trajectory;
-        //}
-        shooting = false;
-        hasBall = false;
     }
 }

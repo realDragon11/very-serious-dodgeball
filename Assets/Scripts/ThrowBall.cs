@@ -30,6 +30,7 @@ public class ThrowBall : MonoBehaviour
     private IEnumerator Throw()
     {
         GameObject instance = Instantiate(ball, transform.position, Quaternion.identity);
+        instance.GetComponent<BallData>().alive = true;
         Rigidbody rb = instance.GetComponent<Rigidbody>();
         Vector3 direction = transform.position - transform.parent.transform.position;
         rb.velocity = direction * strength;
