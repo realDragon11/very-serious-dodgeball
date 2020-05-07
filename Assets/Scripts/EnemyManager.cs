@@ -20,6 +20,7 @@ public class EnemyManager : MonoBehaviour
        ticker++;
        if (ticker > 40){
            screenForBalls();
+           //Debug.Log("Dead Balls: " + deadBalls.Count);
        }
     }
     public void add(EnemyAi foe){
@@ -33,7 +34,7 @@ public class EnemyManager : MonoBehaviour
     public void screenForBalls(){
         deadBalls.Clear();
          foreach (GameObject ball in GameObject.FindGameObjectsWithTag("Ball")){
-             if (!ball.GetComponent<BallData>().alive){
+             if ((ball.GetComponent<BallData>().gameObject.GetComponent<Rigidbody>().velocity.magnitude < 1.0f)){//TODO: fiddle with magic number
             deadBalls.Add(ball.GetComponent<BallData>());}
         }
     }
@@ -56,6 +57,11 @@ public class EnemyManager : MonoBehaviour
                 minDistance = dis;
                 bestBall = ballD;
             }
+        }
+        if (bestBall != null){
+            Debug.Log("Found Ball!");
+        }else{
+            Debug.Log("No balls!");
         }
         return bestBall;
     }

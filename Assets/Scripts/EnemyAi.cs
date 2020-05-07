@@ -55,10 +55,11 @@ public class EnemyAi : MonoBehaviour
                 
                 break;
                 case State.FLEE:
-
+                    state = State.BALL_SEEK;
                 break;
             }
             agent.destination = targetPos;
+            //Debug.Log(state.ToString());
         }
     }
 }
