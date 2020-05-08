@@ -11,11 +11,17 @@ public class TrajectoryCalcculator : MonoBehaviour
     public static Vector3 targetPos, lookTo;
     public static Vector2[] trajectories = new Vector2[5];
     public static Vector2 chosen = Vector2.zero;
+    public int skillLevel = 0;
 
     private Vector3 testRange;
     private float r, g = Physics.gravity.magnitude, minU, maxU = 20;
     public static int selectedTheta;
     private int alpha;
+
+    private void Start()
+    {
+        
+    }
 
     // Update is called once per frame
     void Update()
@@ -24,18 +30,33 @@ public class TrajectoryCalcculator : MonoBehaviour
     }
 
     public void SelectTrajectory()
-    { 
+    {
+        targetPos = AccuracyTollerance();
         LoadVariables();
         LoadAngles();
-
         for(int i = 0; i < trajectories.Length; i++)
         {
-            float maxHeight = MaxHeight(trajectories[i]);
+            float maxHeight = MaxHeight(trajectories[0]);
             highestP = HighestPoint(maxHeight);
         }
         chosen = trajectories[Random.Range(0, trajectories.Length)];
         float t = Time((int)chosen.x, chosen.y);
         lookTo = LookToPoint(t);
+    }
+
+    private Vector3 AccuracyTollerance()
+    {
+        int mod = Random.Range(0, 5 + skillLevel);
+
+        switch(mod)
+        {
+            case 0: return targetPos;
+            case 1: return targetPos + Vector3.forward; ;
+            case 2: return targetPos - Vector3.forward ;
+            case 3: return targetPos + Vector3.right;
+            case 4: return targetPos - Vector3.right;
+            default: return targetPos;
+        }
     }
 
     private void LoadVariables()
@@ -162,7 +183,7 @@ public class TrajectoryCalcculator : MonoBehaviour
         Collider[] cols = Physics.OverlapCapsule(highestP, targetPos, .75f);
         foreach (Collider c in cols)
         {
-            if (!c.CompareTag("Player") || !c.CompareTag("Ground"))
+            if (c.CompareTag("Obstacle"))
             {
                 down = false;
                 break;

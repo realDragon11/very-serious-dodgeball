@@ -35,6 +35,6 @@ public class Health : MonoBehaviour
     public void DeductHealth()
     {
         health--;
-        if (health <= 0) Die();
+        //if (health <= 0) Die();
     }
 }
