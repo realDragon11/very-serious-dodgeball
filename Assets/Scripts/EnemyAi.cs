@@ -28,6 +28,7 @@ public class EnemyAi : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float disToPlayer = Mathf.Abs((player.transform.position - this.gameObject.transform.position).magnitude);
         ticker++;
         if (ticker > 15){
             ticker = 0;
@@ -40,12 +41,12 @@ public class EnemyAi : MonoBehaviour
             }
             switch (state){
                 case State.SEEK:
-                    if (Mathf.Abs((player.transform.position - this.gameObject.transform.position).magnitude) > followDis+Random.Range(0.0f,5)){
+                    if ( disToPlayer > followDis+Random.Range(0.0f,5)){
                         targetPos = player.gameObject.transform.position;
                     }else{
                         state = State.BALL_SEEK;
                         hasBall = false;
-
+                        gameObject.GetComponent<BallSpawner>().ThrowBall();
                     }
                 break;
                 case State.BALL_SEEK:
@@ -67,11 +68,19 @@ public class EnemyAi : MonoBehaviour
                     state = State.BALL_SEEK;
                 break;
             }
+            if ( disToPlayer > followDis+Random.Range(0.0f,10)){
+                        
+                    }else{
+                        state = State.BALL_SEEK;
+                        hasBall = false;
+                        gameObject.GetComponent<BallSpawner>().ThrowBall();
+                    }
             agent.destination = targetPos;
             if (ballSeeking != null){
             if (Vector3.Distance(ballSeeking.gameObject.transform.position,this.gameObject.transform.position) < 1){
                     hasBall = true;
                     GameObject.Destroy(ballSeeking);
+                    gameObject.GetComponent<BallSpawner>().PickupBall();
                 }
             }
             //Debug.Log(state.ToString());
