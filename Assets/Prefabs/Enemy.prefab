@@ -106,8 +106,6 @@ GameObject:
   - component: {fileID: 8425694949478812523}
   - component: {fileID: 7764931655289632357}
   - component: {fileID: 6308786458516519554}
-  - component: {fileID: 3949830364923944446}
-  - component: {fileID: 4499142536412236942}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -198,35 +196,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 7764931655289632357}
   manager: {fileID: 0}
---- !u!114 &3949830364923944446
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3054187751267009134}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b76309dab6ff364c8e7c4d5df4094f1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ball: {fileID: 6885300210842143862, guid: 3edd5950e9469d348bfe0d3b201f01de, type: 3}
-  shooter: {fileID: 2960140497773971232}
---- !u!114 &4499142536412236942
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3054187751267009134}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a2dc09de33264e409149e1957d28a0b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  test: {fileID: 684460395734253783, guid: f3168f73e02f5de489d79beea1d8eacf, type: 3}
-  player: {fileID: 0}
-  skillLevel: 0
+  lookAt: {fileID: 4157156055198117783}
 --- !u!1 &4157156055198117783
 GameObject:
   m_ObjectHideFlags: 0
@@ -236,6 +206,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2960140497773971232}
+  - component: {fileID: 7061059765443590869}
+  - component: {fileID: 4900556899746495625}
   m_Layer: 0
   m_Name: LookAt
   m_TagString: Untagged
@@ -257,6 +229,35 @@ Transform:
   m_Father: {fileID: 3916288160088995717}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7061059765443590869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4157156055198117783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b76309dab6ff364c8e7c4d5df4094f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ball: {fileID: 6885300210842143862, guid: 3edd5950e9469d348bfe0d3b201f01de, type: 3}
+  shooter: {fileID: 2960140497773971232}
+--- !u!114 &4900556899746495625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4157156055198117783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a2dc09de33264e409149e1957d28a0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  test: {fileID: 684460395734253783, guid: f3168f73e02f5de489d79beea1d8eacf, type: 3}
+  player: {fileID: 0}
+  skillLevel: 0
 --- !u!1 &7442407601721773375
 GameObject:
   m_ObjectHideFlags: 0

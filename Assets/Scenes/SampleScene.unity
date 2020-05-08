@@ -1400,6 +1400,11 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 248757839}
+    - target: {fileID: 4900556899746495625, guid: b80b4ad202cdaf4478ba0e71f8d8696f,
+        type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 248757839}
     - target: {fileID: 6308786458516519554, guid: b80b4ad202cdaf4478ba0e71f8d8696f,
         type: 3}
       propertyPath: manager
@@ -1925,6 +1930,11 @@ PrefabInstance:
       objectReference: {fileID: 684460395734253783, guid: f3168f73e02f5de489d79beea1d8eacf,
         type: 3}
     - target: {fileID: 4499142536412236942, guid: b80b4ad202cdaf4478ba0e71f8d8696f,
+        type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 248757839}
+    - target: {fileID: 4900556899746495625, guid: b80b4ad202cdaf4478ba0e71f8d8696f,
         type: 3}
       propertyPath: player
       value: 
@@ -4565,6 +4575,11 @@ PrefabInstance:
       objectReference: {fileID: 684460395734253783, guid: f3168f73e02f5de489d79beea1d8eacf,
         type: 3}
     - target: {fileID: 4499142536412236942, guid: b80b4ad202cdaf4478ba0e71f8d8696f,
+        type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 248757839}
+    - target: {fileID: 4900556899746495625, guid: b80b4ad202cdaf4478ba0e71f8d8696f,
         type: 3}
       propertyPath: player
       value: 

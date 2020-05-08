@@ -16,6 +16,7 @@ public class EnemyAi : MonoBehaviour
     public EnemyManager manager;
     private GameObject ballSeeking;
     private bool hasBall = false;
+    public GameObject lookAt;
     private int ticker, actionDelay = 0,determination= 10;
     // Start is called before the first frame update
     void Start()
@@ -84,7 +85,7 @@ public class EnemyAi : MonoBehaviour
                 if (!hasBall && ballSeeking != null && Vector3.Distance(ballSeeking.gameObject.transform.position,this.gameObject.transform.position) < 1.5f){
                         hasBall = true;
                         GameObject.Destroy(ballSeeking);
-                        gameObject.GetComponent<BallSpawner>().PickupBall();
+                        lookAt.GetComponent<BallSpawner>().PickupBall();
                         actionDelay = 3;
                         state = State.SEEK;
                     }else{
@@ -92,7 +93,7 @@ public class EnemyAi : MonoBehaviour
                 if (hasBall && disToPlayer < followDis+Random.Range(0.0f,10)){
                             state = State.BALL_SEEK;
                             hasBall = false;
-                            gameObject.GetComponent<BallSpawner>().ThrowBall();
+                            lookAt.GetComponent<BallSpawner>().ThrowBall();
                             actionDelay = 10;
                         }}
             }
