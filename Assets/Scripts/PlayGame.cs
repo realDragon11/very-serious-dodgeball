@@ -9,4 +9,14 @@ public class PlayGame : MonoBehaviour
     {
         SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
     }
+
+    public void Instructions()
+    {
+        SceneManager.LoadScene("instructionsscene", LoadSceneMode.Single);
+    }
+
+    public void Back()
+    {
+        SceneManager.LoadScene("Title", LoadSceneMode.Single);
+    }
 }
