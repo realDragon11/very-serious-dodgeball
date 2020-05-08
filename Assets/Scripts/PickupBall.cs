@@ -15,6 +15,7 @@ public class PickupBall : MonoBehaviour
     private Collider lastCaught = null, lastHit = null;
     private Health health;
     private CapsuleCollider cc;
+    public static bool isCaught;
 
     // Start is called before the first frame update
     void Start()
@@ -52,6 +53,7 @@ public class PickupBall : MonoBehaviour
                 {
                     for (int i = 0; i < foreignObjs.Count; i++)
                     {
+                        isCaught = false;
                         if (foreignObjs[i].CompareTag("Ball"))
                         {
                             Collider[] col = InSight.seen.ToArray();
@@ -60,6 +62,7 @@ public class PickupBall : MonoBehaviour
                             {                                
                                 if (foreignObjs[i] == c)
                                 {
+                                    isCaught = true;
                                     caught++;
                                     //print("Catch: " + caught);
                                     lastCaught = foreignObjs[i];
