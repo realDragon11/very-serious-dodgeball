@@ -102,7 +102,7 @@ public class GenerateTerrain : MonoBehaviour
             instance.transform.position = adjusted;
             instance.transform.parent = transform;
         }
-        player.transform.position = new Vector3(xSize / 2, .55f, -2);
+        player.transform.position = new Vector3(xSize / 2, 1.5f, -2);
 
         for(int i = 0; i < numBalls; i++)
         {

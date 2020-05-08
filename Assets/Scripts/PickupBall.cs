@@ -10,10 +10,10 @@ public class PickupBall : MonoBehaviour
     public Image catchImg;
     public static bool isCaught;
 
-    private int caught = 0, hit = 0;
-    private bool fumbleTime = false, catching = false;
+    private int lastCaught = 0;
+    private bool fumbleTime = false, catching = false, closeRangeBall = false;
     private List<Collider> foreignObjs = new List<Collider>();
-    private Collider lastCaught = null, lastHit = null;
+    private Collider lastHit = null;
     private Health health;
     private CapsuleCollider cc;
 
@@ -46,6 +46,7 @@ public class PickupBall : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.LeftShift))
         {
+            closeRangeBall = false;
             if (!fumbleTime && !catching && !ThrowBall.hasBall)
             {
                 StartCoroutine(Catching());
@@ -53,17 +54,17 @@ public class PickupBall : MonoBehaviour
                 {
                     for (int i = 0; i < foreignObjs.Count; i++)
                     {
-                        isCaught = false;
+                        isCaught = false;                        
                         if (foreignObjs[i].CompareTag("Ball"))
                         {
                             Collider[] col = InSight.seen.ToArray();
-
                             foreach (Collider c in col)
                             {
                                 if (foreignObjs[i] == c)
                                 {
+                                    closeRangeBall = true;
                                     isCaught = true;
-                                    lastCaught = foreignObjs[i];
+                                    lastCaught = foreignObjs[i].GetComponent<BallData>().id;
                                     Destroy(foreignObjs[i].gameObject);
                                     foreignObjs.Remove(c);
                                     foreignObjs = new List<Collider>();
@@ -74,21 +75,21 @@ public class PickupBall : MonoBehaviour
                             }
                         }
                     }
-                }
-                else
-                {
-                    if (InSight.seen.Count > 0)
+                    if(!closeRangeBall)
                     {
-                        for (int i = 0; i < InSight.seen.Count; i++)
+                        if (InSight.seen.Count > 0)
                         {
-                            if (InSight.seen[i].CompareTag("Ball"))
+                            for (int i = 0; i < InSight.seen.Count; i++)
                             {
-                                if (!InSight.seen[i].GetComponent<BallData>().alive)
+                                if (InSight.seen[i].CompareTag("Ball"))
                                 {
-                                    Destroy(InSight.seen[i].gameObject);
-                                    InSight.seen.RemoveAt(i);
-                                    ThrowBall.hasBall = true;
-                                    break;
+                                    if (!InSight.seen[i].GetComponent<BallData>().alive)
+                                    {
+                                        Destroy(InSight.seen[i].gameObject);
+                                        InSight.seen.RemoveAt(i);
+                                        ThrowBall.hasBall = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -125,14 +126,11 @@ public class PickupBall : MonoBehaviour
             foreignObjs = new List<Collider>();
             ThrowBall.hasBall = true;
         }
-        else if (collision.collider != null && collision.gameObject.GetComponent<BallData>().alive)
+        else if (collision.gameObject.GetComponent<BallData>().alive)
         {
-            if (collision.collider != lastCaught)
-            {
-                yield return new WaitForSeconds(.5f);
-                lastHit = collision.collider;
+            yield return new WaitForSeconds(.5f);
+            if (collision.collider != null && collision.collider.GetComponent<BallData>().id != lastCaught)
                 health.DeductHealth();
-            }
         }
     }
 
@@ -140,6 +138,7 @@ public class PickupBall : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ball") && collision.collider != lastHit)
         {
+            lastHit = collision.gameObject.GetComponent<BallData>().alive ? collision.collider : lastHit;
             StartCoroutine(CatchBuffer(collision));
         }
     }

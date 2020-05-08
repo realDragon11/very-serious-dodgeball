@@ -21,9 +21,7 @@ public class BallSpawner : MonoBehaviour
     {
         shooter.LookAt(TrajectoryCalcculator.targetPos);
 
-        /*
-        if (!shooting) StartCoroutine(Shoot()); 
-        */
+        //if (!shooting) StartCoroutine(Shoot()); 
     }
 
     private IEnumerator Shoot()

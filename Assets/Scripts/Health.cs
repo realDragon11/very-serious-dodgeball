@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class Health : MonoBehaviour
 {
     public int maxHealth;
+    public Image healthGuage;
+    public Sprite full, twoThirds, oneThird, empty;
 
     private int health;
 
@@ -13,6 +16,7 @@ public class Health : MonoBehaviour
     void Start()
     {
         health = maxHealth;
+        healthGuage.sprite = full;
     }
 
     // Update is called once per frame
@@ -23,7 +27,6 @@ public class Health : MonoBehaviour
 
     private void Die()
     {
-        //health = maxHealth;
         if (CompareTag("Player"))
         {
             Cursor.lockState = CursorLockMode.None;
@@ -35,6 +38,12 @@ public class Health : MonoBehaviour
     public void DeductHealth()
     {
         health--;
-        //if (health <= 0) Die();
+        if (health == 2) healthGuage.sprite = twoThirds;
+        else if (health == 1) healthGuage.sprite = oneThird;
+        else if (health <= 0)
+        {
+            healthGuage.sprite = empty;
+            Die();
+        }
     }
 }

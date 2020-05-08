@@ -6,8 +6,9 @@ public class Move : MonoBehaviour
 {
     public Rigidbody rb;
     public GameObject head;
+    public static bool running = false;
 
-    private float speed = 150f;
+    private float defaultSpeed = 150f, moreSpeed;
 
     // Update is called once per frame
     void Update()
@@ -17,6 +18,17 @@ public class Move : MonoBehaviour
 
     private void Walk()
     {
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            running = true;
+            moreSpeed = 2;
+        }
+        else
+        {
+            running = false;
+            moreSpeed = 1;
+        }
+
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
@@ -25,6 +37,6 @@ public class Move : MonoBehaviour
 
         Vector3 move = horizontal + vertical;
 
-        rb.velocity = (move * speed * Time.deltaTime) + new Vector3(0, rb.velocity.y, 0);
+        rb.velocity = (move * defaultSpeed * moreSpeed * Time.deltaTime) + new Vector3(0, rb.velocity.y, 0);
     }
 }

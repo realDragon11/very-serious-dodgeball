@@ -29,6 +29,11 @@ public class ThrowBall : MonoBehaviour
 
     private IEnumerator Throw()
     {
+        yield return new WaitForEndOfFrame();
+
+        if (Move.running) strength += 5;
+        else strength = 10;
+
         GameObject instance = Instantiate(ball, transform.position, Quaternion.identity);
         instance.GetComponent<BallData>().alive = true;
         Rigidbody rb = instance.GetComponent<Rigidbody>();

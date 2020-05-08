@@ -5,6 +5,12 @@ using UnityEngine;
 public class BallData : MonoBehaviour
 {
     public bool alive = false;
+    public int id;
+
+    private void Start()
+    {
+        id = (int)(Random.value * 100);
+    }
 
     private void OnCollisionEnter(Collision collision)
     {

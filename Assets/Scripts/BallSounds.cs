@@ -34,7 +34,7 @@ public class BallSounds : MonoBehaviour
         else if (collision.gameObject.tag == "Player" || collision.gameObject.tag == "Person")
         {
             ballSource.Play();
-            Debug.Log("Hit");
+            //Debug.Log("Hit");
         }
 
 
