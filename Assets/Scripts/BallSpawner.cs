@@ -36,7 +36,7 @@ public class BallSpawner : MonoBehaviour
         float y = Random.Range(0, 1.0f);
 
         trajectory *= TrajectoryCalcculator.chosen.y;
-        GameObject instance = Instantiate(ball, transform.position, Quaternion.identity);
+        GameObject instance = Instantiate(ball, shooter.transform.position, Quaternion.identity);
         ball.GetComponent<BallData>().alive = true;
         Rigidbody rb = instance.GetComponent<Rigidbody>();
         rb.velocity = trajectory;

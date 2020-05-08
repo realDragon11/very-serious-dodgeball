@@ -210,7 +210,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b76309dab6ff364c8e7c4d5df4094f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ball: {fileID: 0}
+  ball: {fileID: 6885300210842143862, guid: 3edd5950e9469d348bfe0d3b201f01de, type: 3}
   shooter: {fileID: 2960140497773971232}
 --- !u!114 &4499142536412236942
 MonoBehaviour:
@@ -224,7 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a2dc09de33264e409149e1957d28a0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  test: {fileID: 6885300210842143862, guid: 3edd5950e9469d348bfe0d3b201f01de, type: 3}
+  test: {fileID: 684460395734253783, guid: f3168f73e02f5de489d79beea1d8eacf, type: 3}
   player: {fileID: 0}
   skillLevel: 0
 --- !u!1 &4157156055198117783
@@ -251,7 +251,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4157156055198117783}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.79, y: 2.19, z: -0}
+  m_LocalPosition: {x: 1.2, y: 1, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3916288160088995717}
