@@ -35,6 +35,10 @@ public class BallSounds : MonoBehaviour
         {
             ballSource.Play();
             //Debug.Log("Hit");
+            if (collision.gameObject.tag == "Person"){
+                collision.gameObject.GetComponent<EnemyAi>().kill();
+                GameObject.Destroy(collision.gameObject);
+            }
         }
 
 
