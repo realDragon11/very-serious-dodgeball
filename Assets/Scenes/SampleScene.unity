@@ -306,6 +306,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   test: {fileID: 684460395734253783, guid: f3168f73e02f5de489d79beea1d8eacf, type: 3}
   player: {fileID: 248757839}
+  skillLevel: 0
 --- !u!1 &248757837
 GameObject:
   m_ObjectHideFlags: 0
@@ -4267,6 +4268,23 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3949830364923944446, guid: b80b4ad202cdaf4478ba0e71f8d8696f,
+        type: 3}
+      propertyPath: ball
+      value: 
+      objectReference: {fileID: 6885300210842143862, guid: 3edd5950e9469d348bfe0d3b201f01de,
+        type: 3}
+    - target: {fileID: 4499142536412236942, guid: b80b4ad202cdaf4478ba0e71f8d8696f,
+        type: 3}
+      propertyPath: test
+      value: 
+      objectReference: {fileID: 684460395734253783, guid: f3168f73e02f5de489d79beea1d8eacf,
+        type: 3}
+    - target: {fileID: 4499142536412236942, guid: b80b4ad202cdaf4478ba0e71f8d8696f,
+        type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 248757839}
     - target: {fileID: 6308786458516519554, guid: b80b4ad202cdaf4478ba0e71f8d8696f,
         type: 3}
       propertyPath: manager

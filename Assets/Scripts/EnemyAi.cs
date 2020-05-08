@@ -16,7 +16,7 @@ public class EnemyAi : MonoBehaviour
     public EnemyManager manager;
     private GameObject ballSeeking;
     private bool hasBall = false;
-    private int ticker;
+    private int ticker, actionDelay = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -68,21 +68,28 @@ public class EnemyAi : MonoBehaviour
                     state = State.BALL_SEEK;
                 break;
             }
-            if ( disToPlayer > followDis+Random.Range(0.0f,10)){
-                        
-                    }else{
-                        state = State.BALL_SEEK;
-                        hasBall = false;
-                        gameObject.GetComponent<BallSpawner>().ThrowBall();
+            if (actionDelay > 0){
+                actionDelay--;
+            }else{
+                if (Vector3.Distance(ballSeeking.gameObject.transform.position,this.gameObject.transform.position) < 1){
+                        hasBall = true;
+                        GameObject.Destroy(ballSeeking);
+                        gameObject.GetComponent<BallSpawner>().PickupBall();
+                        actionDelay = 3;
                     }
+                }
+                if ( disToPlayer > followDis+Random.Range(0.0f,10)){
+                            
+                        }else{
+                            state = State.BALL_SEEK;
+                            hasBall = false;
+                            gameObject.GetComponent<BallSpawner>().ThrowBall();
+                            actionDelay = 10;
+                        }
+            }
             agent.destination = targetPos;
             if (ballSeeking != null){
-            if (Vector3.Distance(ballSeeking.gameObject.transform.position,this.gameObject.transform.position) < 1){
-                    hasBall = true;
-                    GameObject.Destroy(ballSeeking);
-                    gameObject.GetComponent<BallSpawner>().PickupBall();
-                }
-            }
+            
             //Debug.Log(state.ToString());
         }
     }
