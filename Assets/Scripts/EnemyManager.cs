@@ -19,7 +19,7 @@ public class EnemyManager : MonoBehaviour
     {
        ticker++;
        if (ticker > 40){
-           screenForBalls();
+           //screenForBalls();
            //Debug.Log("Dead Balls: " + deadBalls.Count);
        }
     }
@@ -40,6 +40,7 @@ public class EnemyManager : MonoBehaviour
     }
 
     public BallData requestBall(EnemyAi foe){
+        screenForBalls();
         List<BallData> considering = new List<BallData>();
         foreach (BallData ballD in deadBalls)
         {
@@ -52,6 +53,7 @@ public class EnemyManager : MonoBehaviour
         float dis;
         foreach (BallData ballD in considering)
         {
+           
             dis = Vector3.Distance(ballD.gameObject.transform.position,foe.gameObject.transform.position);
             if (dis < minDistance){
                 minDistance = dis;

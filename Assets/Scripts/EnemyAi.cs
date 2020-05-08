@@ -41,12 +41,8 @@ public class EnemyAi : MonoBehaviour
             }
             switch (state){
                 case State.SEEK:
-                    if ( disToPlayer > followDis+Random.Range(0.0f,5)){
+                    if ( disToPlayer > followDis){
                         targetPos = player.gameObject.transform.position;
-                    }else{
-                        state = State.BALL_SEEK;
-                        hasBall = false;
-                        gameObject.GetComponent<BallSpawner>().ThrowBall();
                     }
                 break;
                 case State.BALL_SEEK:
@@ -68,30 +64,29 @@ public class EnemyAi : MonoBehaviour
                     state = State.BALL_SEEK;
                 break;
             }
-            if (actionDelay > 0){
+            
+            agent.destination = targetPos;
+            //if (ballSeeking != null){
+            
+            //Debug.Log(state.ToString());
+        }
+        if (actionDelay > 0){
                 actionDelay--;
             }else{
-                if (Vector3.Distance(ballSeeking.gameObject.transform.position,this.gameObject.transform.position) < 1){
+                if (ballSeeking != null && Vector3.Distance(ballSeeking.gameObject.transform.position,this.gameObject.transform.position) < 1.5f){
                         hasBall = true;
                         GameObject.Destroy(ballSeeking);
                         gameObject.GetComponent<BallSpawner>().PickupBall();
                         actionDelay = 3;
                     }
-                }
-                if ( disToPlayer > followDis+Random.Range(0.0f,10)){
-                            
-                        }else{
+                
+                if (hasBall && disToPlayer < followDis+Random.Range(0.0f,10)){
                             state = State.BALL_SEEK;
                             hasBall = false;
                             gameObject.GetComponent<BallSpawner>().ThrowBall();
                             actionDelay = 10;
                         }
             }
-            agent.destination = targetPos;
-            if (ballSeeking != null){
-            
-            //Debug.Log(state.ToString());
-        }
     }
 
     public void kill(){
