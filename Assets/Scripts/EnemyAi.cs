@@ -32,26 +32,35 @@ public class EnemyAi : MonoBehaviour
         if (ticker > 15){
             ticker = 0;
             targetPos = transform.position;
+            if (ballSeeking != null){
+            manager.freeBall(ballSeeking.GetComponent<BallData>());}
             ballSeeking = null;
             if (hasBall){
                 state = State.SEEK;
             }
             switch (state){
                 case State.SEEK:
-                    if (Mathf.Abs((player.transform.position - this.gameObject.transform.position).magnitude) > followDis){
+                    if (Mathf.Abs((player.transform.position - this.gameObject.transform.position).magnitude) > followDis+Random.Range(0.0f,5)){
                         targetPos = player.gameObject.transform.position;
+                    }else{
+                        state = State.BALL_SEEK;
+                        hasBall = false;
+
                     }
                 break;
                 case State.BALL_SEEK:
 
-                if (ballSeeking = null){
-                ballSeeking = manager.requestBall(this).gameObject;
+                if (ballSeeking == null){
+                var temp = manager.requestBall(this);
+                if (temp != null){
+                ballSeeking = temp.gameObject;}
                 }
                 if (ballSeeking != null){
                     targetPos = ballSeeking.transform.position;
                 }else{
                     state = State.FLEE;
                 }
+
                 
                 break;
                 case State.FLEE:
@@ -59,7 +68,19 @@ public class EnemyAi : MonoBehaviour
                 break;
             }
             agent.destination = targetPos;
+            if (ballSeeking != null){
+            if (Vector3.Distance(ballSeeking.gameObject.transform.position,this.gameObject.transform.position) < 1){
+                    hasBall = true;
+                    GameObject.Destroy(ballSeeking);
+                }
+            }
             //Debug.Log(state.ToString());
         }
+    }
+
+    public void kill(){
+        manager.remove(this);
+        if (ballSeeking != null){
+            manager.freeBall(ballSeeking.GetComponent<BallData>());}
     }
 }

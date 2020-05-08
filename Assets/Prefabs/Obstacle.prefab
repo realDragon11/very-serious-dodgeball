@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6168922070560709638}
   - component: {fileID: 6394778161401988576}
   - component: {fileID: 7039043754266407839}
-  - component: {fileID: 6046273573028156889}
+  - component: {fileID: 3910378297624690219}
   m_Layer: 0
   m_Name: Obstacle
   m_TagString: Untagged
@@ -93,7 +93,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!208 &6046273573028156889
+--- !u!208 &3910378297624690219
 NavMeshObstacle:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

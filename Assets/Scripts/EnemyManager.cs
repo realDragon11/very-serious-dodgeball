@@ -34,7 +34,7 @@ public class EnemyManager : MonoBehaviour
     public void screenForBalls(){
         deadBalls.Clear();
          foreach (GameObject ball in GameObject.FindGameObjectsWithTag("Ball")){
-             if ((ball.GetComponent<BallData>().gameObject.GetComponent<Rigidbody>().velocity.magnitude < 1.0f)){//TODO: fiddle with magic number
+             if ((!ball.GetComponent<BallData>().alive)){//TODO: fiddle with magic number  && ball.GetComponent<BallData>().gameObject.GetComponent<Rigidbody>().velocity.magnitude < 3.0f
             deadBalls.Add(ball.GetComponent<BallData>());}
         }
     }
@@ -47,7 +47,7 @@ public class EnemyManager : MonoBehaviour
                 considering.Add(ballD);
             }
         }
-        float minDistance = 30;
+        float minDistance = 999999999999999;
         BallData bestBall = null;
         float dis;
         foreach (BallData ballD in considering)
@@ -59,10 +59,15 @@ public class EnemyManager : MonoBehaviour
             }
         }
         if (bestBall != null){
-            Debug.Log("Found Ball!");
+            //Debug.Log("Found Ball!");
+            taken.Add(bestBall);
         }else{
-            Debug.Log("No balls!");
+            //Debug.Log("No balls!");
         }
         return bestBall;
+    }
+
+    public void freeBall(BallData b){
+        taken.Remove(b);
     }
 }
